@@ -1,0 +1,25 @@
+alpha = _{ 'a'..'z' | 'A'..'Z' }
+other = _{ ("-" | "_") }
+digit = _{ '0'..'9' }
+one_through_nine = _{'1'..'9'}
+zero_through_one = _{'0'..'1'}
+zero_through_two = _{ '0'..'2' }
+zero_through_five = _{'0'..'5'}
+
+zero_through_six = _{'0'..'6'}
+
+base = { alpha ~ (alpha | digit | other)+ }
+extension = {alpha ~ (alpha | digit)+ }
+
+year = { digit{4} }
+month = { ("0" ~ one_through_nine) | ( "1" ~ zero_through_two ) }
+day = { (zero_through_two ~ digit) | ( "3" ~ zero_through_one) }
+hour = { (zero_through_one ~ digit) | ("2" ~ '0'..'4') }
+minute = { (zero_through_five ~ digit) | "60" }
+second = { (zero_through_five ~ digit) | "60"}
+datetime = { year ~ month  ~ day ~ "-" ~ hour ~ minute ~ second }
+revision_id = { digit+ }
+revision = {"_r" ~ revision_id }
+// foo.xml.20181005-225911
+// foo.xml.20181106-121133_r34566798
+fileversion = { base ~ "." ~ extension ~ "." ~ datetime ~ revision{0,1} }

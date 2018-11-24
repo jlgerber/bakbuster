@@ -1,0 +1,14 @@
+[package]
+name = "bakbuster"
+version = "0.1.0"
+authors = ["jonathan gerber <jlgerber@gmail.com>"]
+
+[dependencies]
+pest="2.0"
+pest_derive="2.0"
+chrono="0.4"
+failure="0.1"
+xml-rs="0.8"
+structopt="0.2"
+log="0.4"
+env_logger="0.6"
