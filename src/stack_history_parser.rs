@@ -9,8 +9,8 @@ use errors::BBError;
 use fileversionparser::FileVersion;
 use std::io::Read;
 use xml::reader::{EventReader, XmlEvent};
-
-/// given an input which implements the Read trait, and a datetime, find the
+use std::str::FromStr;
+/// Given an input which implements the Read trait, and a datetime, find the
 /// latest FileVersion at or before the supplied datetime, which is also prior to or
 /// at the current file. (ie no fileversions after the one marked as current will be considered)
 ///
@@ -89,6 +89,7 @@ pub fn get_file_version_on<R: Read>(input: R, datetime: NaiveDateTime) -> Result
 
     Err(BBError::ParseError("No current fileversion found".to_string()))
 }
+
 
 #[cfg(test)]
 mod test {
