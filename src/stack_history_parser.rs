@@ -3,7 +3,7 @@
 //use std::io::BufReader;
 
 use chrono::prelude::*;
-use chrono::offset;
+//use chrono::offset;
 use chrono::naive::NaiveDateTime;
 use errors::BBError;
 use fileversionparser::FileVersion;
@@ -18,11 +18,9 @@ use xml::reader::{EventReader, XmlEvent};
 /// ```rust,ignore
 /// let filehandle = File::open(file).unwrap();
 /// let file = BufReader::new(filehandle);
-/// let result = get_file_version_on(file, Utc::now());
+/// let result = get_file_version_on(file, Local::now().naive_local());
 /// ```
 pub fn get_file_version_on<R: Read>(input: R, datetime: NaiveDateTime) -> Result<FileVersion, BBError> {
-    //let filehandle = File::open(file).unwrap();
-    //let file = BufReader::new(filehandle);
 
     let parser = EventReader::new(input);
     let mut file_version: Option<FileVersion> = None;
@@ -51,11 +49,13 @@ pub fn get_file_version_on<R: Read>(input: R, datetime: NaiveDateTime) -> Result
                                 let fv = FileVersion::from_str(attr.value.as_str())?;
                                 matched_version = true;
                                 if fv.date_time <= datetime {
-                                    println!("version: {}", fv);
+                                    debug!("version: {}", fv);
                                     file_version = Some(fv);
                                 }
                             },
-                            _ => {return Err(BBError::ParseError(format!("attribute {} not valid", namestr)))}
+                            _ => {
+                                return Err(BBError::ParseError(format!("attribute {} not valid", namestr)))
+                            }
                         }
                         // we need to wait until we have matched the version attribute as well as
                         // evaluated whether we are current. Otherwise, we will return early
