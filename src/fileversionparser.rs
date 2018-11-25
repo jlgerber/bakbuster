@@ -2,6 +2,7 @@ use pest::Parser;
 use errors::BBError;
 use chrono::prelude::*;
 use std::fmt;
+use std::str::FromStr;
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub struct FileVersion {
@@ -21,8 +22,16 @@ impl FileVersion {
         }
     }
 
-    pub fn from_str(name: &str) -> Result< FileVersion, BBError> {
-        FileVersionParser::parse(name)
+    // pub fn from_str(name: &str) -> Result< FileVersion, BBError> {
+    //     FileVersionParser::parse(name)
+    // }
+}
+
+impl FromStr for FileVersion {
+     type Err = BBError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        FileVersionParser::parse(s)
     }
 }
 
