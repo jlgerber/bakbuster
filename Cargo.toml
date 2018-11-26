@@ -1,6 +1,6 @@
 [package]
 name = "bakbuster"
-version = "0.1.0"
+version = "0.2.1"
 authors = ["jonathan gerber <jlgerber@gmail.com>"]
 
 [dependencies]

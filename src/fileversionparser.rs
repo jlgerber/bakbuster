@@ -44,7 +44,7 @@ fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
             "".to_string()
         };
 
-        write!(f, "({}.{}.{}{}{}-{}{}{}{})",
+        write!(f, "{}.{}.{}{}{}-{}{}{}{}",
             self.name,
             self.extension,
             self.date_time.year(),self.date_time.month(), self.date_time.day(),

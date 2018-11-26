@@ -1,15 +1,55 @@
 
-//use std::fs::File;
-//use std::io::BufReader;
-
 use chrono::prelude::*;
-//use chrono::offset;
 use chrono::naive::NaiveDateTime;
 use errors::BBError;
 use fileversionparser::FileVersion;
 use std::io::Read;
 use xml::reader::{EventReader, XmlEvent};
 use std::str::FromStr;
+use std::path::PathBuf;
+
+/// Given a path to an swinstalled file, return the path to its swinstall_stack file
+/// within the bak directory.
+///
+/// # Example
+///
+/// Given:
+///
+///  ```text,ignore
+/// ./foo_preference.yaml
+/// ```
+///
+/// Return:
+///
+/// ```text,ignore
+/// ./bak/foo_preference.yaml/foo_preference.yaml_swinstall_stack
+/// ```
+///
+/// as a PathBuf wrapped in a result.
+pub fn stack_history_from_path<F: Into<PathBuf>>(file: F) -> Result<PathBuf, BBError> {
+    let mut pb = file.into();
+    let filename = match pb.file_name() {
+        Some(fname) => match fname.to_str(){
+            Some(n) => n.to_string(),
+            None => {return Err(BBError::ConversionError("failed to convert filename  to str".to_string()))},
+        },
+        None => {return Err(BBError::ConversionError(format!("Unable to get filename from '{:?}'", pb)))},
+    };
+    // remove filename
+    pb.pop();
+
+    // build up path to swinstall stack file
+    // ie given
+    //   ./foo.yaml
+    // return
+    //   ./bak/foo.yaml/foo.yaml_swinstall_stack
+    pb.push("bak");
+    pb.push(filename.as_str());
+    let swinstall_stack = format!("{}_swinstall_stack", filename.as_str());
+    pb.push(swinstall_stack);
+    Ok(pb)
+}
+
 /// Given an input which implements the Read trait, and a datetime, find the
 /// latest FileVersion at or before the supplied datetime, which is also prior to or
 /// at the current file. (ie no fileversions after the one marked as current will be considered)
