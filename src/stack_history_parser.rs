@@ -72,26 +72,13 @@ pub fn get_file_version_on<R: Read>(input: R, datetime: NaiveDateTime) -> Result
                     let mut matched_version = false;
                     for attr in attributes {
                         let namestr = attr.name.local_name.as_str();
-
                         match namestr {
                             "is_current" => {
-                                current = if attr.value == "True" {
-                                    true
-                                } else if attr.value == "False" {
-                                    false
-                                } else {
-                                    return Err(BBError::ParseError(
-                                        format!("Unable to parse is_current value : '{}'", attr.value)
-                                    ));
-                                };
+                                current = match_current_str(attr.value.as_str())?;
                             },
                             "version" => {
-                                let fv = FileVersion::from_str(attr.value.as_str())?;
                                 matched_version = true;
-                                if fv.date_time <= datetime {
-                                    debug!("version: {}", fv);
-                                    file_version = Some(fv);
-                                }
+                                update_file_version_if_in_range(attr.value.as_str(),&mut file_version, &datetime)?;
                             },
                             _ => {
                                 return Err(BBError::ParseError(format!("attribute {} not valid", namestr)))
@@ -130,6 +117,26 @@ pub fn get_file_version_on<R: Read>(input: R, datetime: NaiveDateTime) -> Result
     Err(BBError::ParseError("No current fileversion found".to_string()))
 }
 
+fn match_current_str(current: &str) -> Result<bool, BBError> {
+    if current == "True" {
+        Ok(true)
+    } else if current == "False" {
+        Ok(false)
+    } else {
+         Err(BBError::ParseError(
+            format!("Unable to parse is_current value : '{}'", current)
+        ))
+    }
+}
+
+fn update_file_version_if_in_range(version: &str, file_version: &mut Option<FileVersion>, datetime: &NaiveDateTime) -> Result<(),BBError> {
+    let fv = FileVersion::from_str(version)?;
+    if fv.date_time <= *datetime {
+        debug!("version: {}", fv);
+        *file_version = Some(fv);
+    }
+    Ok(())
+}
 
 #[cfg(test)]
 mod test {
