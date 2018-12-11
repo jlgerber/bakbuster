@@ -128,8 +128,8 @@ pub fn get_file_version_on<R: Read>(input: R, datetime: NaiveDateTime) -> Result
 // return Ok of bool. If unsuccessful, return an Err of BBError.
 fn match_current_str(current: &str) -> Result<bool, BBError> {
     match current {
-        "True" || "true" => Ok(true),
-        "False" || "false" => Ok(false),
+        "True" | "true" => Ok(true),
+        "False" | "false" => Ok(false),
         _ => Err(BBError::ParseError(
             format!("Unable to parse is_current value : '{}'", current)
         )),
@@ -166,14 +166,14 @@ mod test {
     fn parse() {
         let xml =
 r#"<stack_history path="/dd/facility/etc/bak/packages.xml/packages.xml_swinstall_stack">
-    <elt is_current="False" version="packages.xml.20161213-093146_r575055" />
-    <elt is_current="False" version="packages.xml.20181102-144204" />
-    <elt is_current="True" version="packages.xml.20181105-103813" />
-    <elt is_current="False" version="packages.xml.20181106-104603" />
+    <elt is_current="False" version="20161213-093146_r575055" />
+    <elt is_current="False" version="20181102-144204" />
+    <elt is_current="True" version="20181105-103813" />
+    <elt is_current="False" version="20181106-104603" />
 </stack_history>"#;
 
         let result = get_file_version_on(xml.as_bytes(), Local::now().naive_local());
-        let expected = FileVersion::from_str("packages.xml.20181105-103813");
+        let expected = FileVersion::from_str("20181105-103813");
         assert_eq!(result, expected);
     }
 
@@ -182,14 +182,14 @@ r#"<stack_history path="/dd/facility/etc/bak/packages.xml/packages.xml_swinstall
     fn parse_old() {
         let xml =
 r#"<stack_history path="/dd/facility/etc/bak/packages.xml/packages.xml_swinstall_stack">
-    <elt is_current="False" version="packages.xml.20161213-093146_r575055" />
-    <elt is_current="False" version="packages.xml.20181102-144204" />
-    <elt is_current="True" version="packages.xml.20181105-103813" />
-    <elt is_current="False" version="packages.xml.20181106-104603" />
+    <elt is_current="False" version="20161213-093146_r575055" />
+    <elt is_current="False" version="20181102-144204" />
+    <elt is_current="True" version="20181105-103813" />
+    <elt is_current="False" version="20181106-104603" />
 </stack_history>"#;
 
         let result = get_file_version_on(xml.as_bytes(), NaiveDate::from_ymd(2018,11,2).and_hms(14,42,4));
-        let expected = FileVersion::from_str("packages.xml.20181102-144204");
+        let expected = FileVersion::from_str("20181102-144204");
         assert_eq!(result, expected);
     }
 }

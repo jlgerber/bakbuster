@@ -6,17 +6,13 @@ use std::str::FromStr;
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub struct FileVersion {
-    pub name: String,
-    pub extension: String,
     pub date_time: NaiveDateTime,
     pub revision: Option<String>
 }
 
 impl FileVersion {
-    pub fn new(name: String, extension: String, date_time: NaiveDateTime, revision: Option<String>) -> FileVersion {
+    pub fn new(date_time: NaiveDateTime, revision: Option<String>) -> FileVersion {
         FileVersion {
-            name,
-            extension,
             date_time,
             revision,
         }
@@ -44,9 +40,7 @@ fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
             "".to_string()
         };
 
-        write!(f, "{}.{}.{}{}{}-{}{}{}{}",
-            self.name,
-            self.extension,
+        write!(f, "{}{}{}-{}{}{}{}",
             self.date_time.year(),self.date_time.month(), self.date_time.day(),
             self.date_time.hour(), self.date_time.minute(), self.date_time.second(),
             revision
@@ -73,8 +67,6 @@ impl FileVersionParser {
 
         // parsing guarantees that these vars are going to get set. we just choose arbitrary
         // values for now.
-        let mut name = None;
-        let mut extension = None;
         let mut year = None;
         let mut month = None;
         let mut day = None;
@@ -90,12 +82,7 @@ impl FileVersionParser {
                 let inner_span = inner_idx_piece.clone().into_span();
 
                 match inner_idx_piece.as_rule() {
-                    Rule::base => {
-                        name = Some(inner_span.as_str().to_string());
-                    },
-                    Rule::extension => {
-                        extension = Some(inner_span.as_str().to_string());
-                    },
+
                     Rule::revision => {
                         for revision_piece in inner_idx_piece.into_inner() {
                             let inner_span = revision_piece.clone().into_span();
@@ -141,7 +128,7 @@ impl FileVersionParser {
            NaiveDate::from_ymd(year.unwrap(), month.unwrap(), day.unwrap())
               .and_hms(hour.unwrap(), minute.unwrap(), second.unwrap());
 
-        let fileversion = FileVersion::new(name.unwrap(), extension.unwrap(), dt, revision);
+        let fileversion = FileVersion::new(dt, revision);
         Ok(fileversion)
     }
 }
@@ -152,11 +139,9 @@ mod tests {
 
     #[test]
     fn parse_file_version() {
-        let fvstr = "packages.xml.20181105-103813";
+        let fvstr = "20181105-103813";
         let fv = FileVersion::from_str(&fvstr);
         let expect = FileVersion {
-            name: "packages".to_string(),
-            extension: "xml".to_string(),
             date_time: NaiveDate::from_ymd(2018, 11, 5).and_hms(10,38,13),
             revision: None,
         };
@@ -165,11 +150,9 @@ mod tests {
 
     #[test]
     fn parse_file_version_revision() {
-        let fvstr = "packages.xml.20181105-103813_r12431345";
+        let fvstr = "20181105-103813_r12431345";
         let fv = FileVersion::from_str(&fvstr);
         let expect = FileVersion {
-            name: "packages".to_string(),
-            extension: "xml".to_string(),
             date_time: NaiveDate::from_ymd(2018, 11, 5).and_hms(10,38,13),
             revision: Some("12431345".to_string()),
         };

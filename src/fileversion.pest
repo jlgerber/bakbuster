@@ -20,6 +20,6 @@ second = { (zero_through_five ~ digit) | "60"}
 datetime = { year ~ month  ~ day ~ "-" ~ hour ~ minute ~ second }
 revision_id = { digit+ }
 revision = {"_r" ~ revision_id }
-// foo.xml.20181005-225911
-// foo.xml.20181106-121133_r34566798
-fileversion = { base ~ "." ~ extension ~ "." ~ datetime ~ revision{0,1} }
+// 20181005-225911
+// 20181106-121133_r34566798
+fileversion = {  datetime ~ revision{0,1} }
